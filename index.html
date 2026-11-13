@@ -50,27 +50,30 @@
     </div>
 
     <script>
+        // 扩充至 18 个选项，加入家庭、服侍与信仰
         const items = [
             { id: 1, text: "职场狂飙：极速升职加薪，薪水远超同龄人，但责任极大", weight: 7 },
             { id: 2, text: "提早财富自由：顺利买到理想的车与房，物质生活令人羡慕", weight: 8 },
-            { id: 3, text: "完美的浪漫关系：拥有一段充满仪式感、情绪价值拉满的感情", weight: 6 },
-            { id: 4, text: "家族的骄傲：成为亲戚口中最有出息的孩子，满足长辈期待", weight: 6 },
-            { id: 5, text: "掌控一切的安全感：人生绝对按计划表进行，不允许出现意外", weight: 7 },
-            { id: 6, text: "讨好型人格：同事丢烂摊子、朋友求帮忙，你都不好意思拒绝", weight: 7 },
-            { id: 7, text: "追求终极梦想：不顾一切去搞自己最爱的兴趣或创业", weight: 6 },
-            { id: 8, text: "零差评的好人缘：在朋友圈和职场所有人都喜欢你，不得罪人", weight: 5 },
-            { id: 9, text: "成功的副业：除了正职，还有一个能赚钱的副业", weight: 5 },
-            { id: 10, text: "绝对的准时下班：下班绝不回信息，周末完全属于自己", weight: 4 },
-            { id: 11, text: "极致的健康与自律：坚持运动和干净饮食，保持最佳状态", weight: 4 },
-            { id: 12, text: "毫无破绽的IG人设：在网上必须看起来精致、合群、闪闪发光", weight: 3 },
-            { id: 13, text: "周末彻底断联躺平：拒绝任何社交邀约，在家废废地过一天", weight: 2 },
-            { id: 14, text: "报复性熬夜刷手机：用牺牲睡眠来换取短暂逃避现实的自由", weight: 2 },
-            { id: 15, text: "每天一杯续命奶茶/咖啡：靠微小的甜食和快乐来对抗日常压力", weight: 1 }
+            { id: 3, text: "温馨美满的家庭：拥有相爱相挺的家人，家是你最温暖的避风港", weight: 7 }, // 新增
+            { id: 4, text: "永恒的信仰与真理 (圣经)：拥有神的话语作指引，确信凡事都有神同在", weight: 6 }, // 新增
+            { id: 5, text: "同心合意的属灵伙伴：有一群陪你一起服侍、热血参与教会活动的弟兄姐妹", weight: 5 }, // 新增
+            { id: 6, text: "完美的浪漫关系：拥有一段充满仪式感、情绪价值拉满的感情", weight: 6 },
+            { id: 7, text: "家族的骄傲：成为亲戚口中最有出息的孩子，满足长辈期待", weight: 6 },
+            { id: 8, text: "掌控一切的安全感：人生绝对按计划表进行，不允许出现意外", weight: 7 },
+            { id: 9, text: "讨好型人格：同事丢烂摊子、朋友求帮忙，你都不好意思拒绝", weight: 7 },
+            { id: 10, text: "追求终极梦想：不顾一切去搞自己最爱的兴趣或创业", weight: 6 },
+            { id: 11, text: "零差评的好人缘：在朋友圈和职场所有人都喜欢你，不得罪人", weight: 5 },
+            { id: 12, text: "绝对的准时下班：下班绝不回信息，周末完全属于自己", weight: 4 },
+            { id: 13, text: "极致的健康与自律：坚持运动和干净饮食，保持最佳状态", weight: 4 },
+            { id: 14, text: "毫无破绽的IG人设：在网上必须看起来精致、合群、闪闪发光", weight: 3 },
+            { id: 15, text: "周末彻底断联躺平：拒绝任何社交邀约，在家废废地过一天", weight: 2 },
+            { id: 16, text: "报复性熬夜刷手机：用牺牲睡眠来换取短暂逃避现实的自由", weight: 2 },
+            { id: 17, text: "每天一杯续命奶茶/咖啡：靠微小的甜食和快乐来对抗日常压力", weight: 1 }
         ];
 
         let currentStage = 1;
         let selectedItems = new Set();
-        let currentBackpack = []; // 记录玩家成功带入下一关的物品
+        let currentBackpack = []; 
         let currentWeight = 0;
         let baselineWeight = 0;
 
@@ -85,7 +88,6 @@
         function renderItems() {
             container.innerHTML = '';
             
-            // 核心修改：第一关显示所有，后面的关卡只显示“包里还剩下的物品”
             const displayItems = currentStage === 1 ? items : items.filter(i => currentBackpack.includes(i.id));
 
             displayItems.forEach(item => {
@@ -114,7 +116,7 @@
             } else {
                 selectedItems.add(id);
             }
-            renderItems(); // 重新渲染颜色和勾选状态
+            renderItems(); 
         }
 
         function updateLogic() {
@@ -170,7 +172,6 @@
             }
             else if (currentStage === 4) {
                 warningText.classList.remove('hidden');
-                // 核心修改：只允许保留 1 项
                 if (selectedItems.size === 1) {
                     isValid = true;
                     warningText.textContent = "已选定你最后的底线。";
@@ -191,7 +192,6 @@
         }
 
         nextBtn.onclick = () => {
-            // 核心修改：锁定当前身上的物品，传给下一关
             currentBackpack = Array.from(selectedItems); 
             baselineWeight = currentWeight;
             currentStage++;
@@ -201,7 +201,7 @@
                 stageDesc.textContent = "大太阳下体力不支。你必须立刻划掉 4kg 才能继续。";
                 nextBtn.textContent = "继续前行";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                renderItems(); // 重新渲染，隐藏没选的东西
+                renderItems(); 
             } 
             else if (currentStage === 3) {
                 stageTitle.textContent = "第二关：脚车爆胎";
@@ -234,7 +234,6 @@
             }
         };
 
-        // 初始启动
         renderItems();
     </script>
 </body>

@@ -6,7 +6,6 @@
     <title>适耕庄：20kg 人生行囊大挑战</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 自定义勾选框的样式，让它在手机上更好点击 */
         input[type="checkbox"] {
             width: 1.5rem;
             height: 1.5rem;
@@ -32,7 +31,6 @@
             <span class="text-sm font-semibold">当前重量:</span>
             <span class="text-lg font-bold text-indigo-600" id="weight-display">0 kg</span>
         </div>
-        <!-- 进度条 -->
         <div class="w-full bg-gray-200 rounded-full h-2.5">
             <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" id="weight-bar" style="width: 0%"></div>
         </div>
@@ -41,7 +39,7 @@
 
     <!-- 选项列表 -->
     <div class="p-4 max-w-lg mx-auto" id="items-container">
-        <!-- JS 会自动在这里生成选项 -->
+        <!-- JS 会自动生成选项 -->
     </div>
 
     <!-- 底部操作按钮 -->
@@ -52,29 +50,29 @@
     </div>
 
     <script>
+        // 全新升级的清单，加入了极具诱惑力的 1kg 和 2kg 选项
         const items = [
             { id: 1, text: "职场狂飙：极速升职加薪，薪水远超同龄人，但责任极大", weight: 7 },
             { id: 2, text: "提早财富自由：顺利买到理想的车与房，物质生活令人羡慕", weight: 8 },
             { id: 3, text: "完美的浪漫关系：拥有一段充满仪式感、情绪价值拉满的感情", weight: 6 },
-            { id: 4, text: "家族的骄傲：成为父母亲戚口中最有出息的孩子，满足长辈期待", weight: 6 },
-            { id: 5, text: "零差评的好人缘：在职场和朋友圈里所有人都喜欢你，不得罪任何人", weight: 6 },
-            { id: 6, text: "绝对的准时下班：下班绝不回信息，周末完全属于自己", weight: 5 },
-            { id: 7, text: "说走就走的自由：每年两次出国旅行，生活体验丰富自由", weight: 5 },
-            { id: 8, text: "追求终极梦想：不管能不能赚钱，全心全意去搞最爱的兴趣或创业", weight: 6 },
-            { id: 9, text: "极致的健康与自律：坚持干净饮食，永远保持最佳精神与身体状态", weight: 4 },
-            { id: 10, text: "疯狂的自我提升：永远在学习新技能考证，保证绝对不被社会淘汰", weight: 5 },
-            { id: 11, text: "核心黏合剂：你是朋友中最可靠的人，谁有困难你都第一时间冲去陪伴", weight: 5 },
-            { id: 12, text: "躺平的安全区：不承担大风险，只想安安稳稳待在舒适圈过小日子", weight: 5 },
-            { id: 13, text: "掌控一切的安全感：人生绝对按计划表进行，绝不允许出现意外", weight: 7 },
-            { id: 14, text: "成功的副业：除了正职，还有一个能赚钱的副业，不靠死薪水", weight: 6 },
-            { id: 15, text: "不求人的独立：无论遇到什么困难都自己扛下来，绝不开口麻烦别人", weight: 5 }
+            { id: 4, text: "家族的骄傲：成为亲戚口中最有出息的孩子，满足长辈期待", weight: 6 },
+            { id: 5, text: "掌控一切的安全感：人生绝对按计划表进行，不允许出现意外", weight: 7 },
+            { id: 6, text: "讨好型人格：同事丢烂摊子、朋友求帮忙，你都不好意思拒绝", weight: 7 },
+            { id: 7, text: "追求终极梦想：不顾一切去搞自己最爱的兴趣或创业", weight: 6 },
+            { id: 8, text: "零差评的好人缘：在朋友圈和职场所有人都喜欢你，不得罪人", weight: 5 },
+            { id: 9, text: "成功的副业：除了正职，还有一个能赚钱的副业", weight: 5 },
+            { id: 10, text: "绝对的准时下班：下班绝不回信息，周末完全属于自己", weight: 4 },
+            { id: 11, text: "极致的健康与自律：坚持运动和干净饮食，保持最佳状态", weight: 4 },
+            { id: 12, text: "毫无破绽的IG人设：在网上必须看起来精致、合群、闪闪发光", weight: 3 },
+            { id: 13, text: "周末彻底断联躺平：拒绝任何社交邀约，在家废废地过一天", weight: 2 },
+            { id: 14, text: "报复性熬夜刷手机：用牺牲睡眠来换取短暂逃避现实的自由", weight: 2 },
+            { id: 15, text: "每天一杯续命奶茶/咖啡：靠微小的甜食和快乐来对抗日常压力", weight: 1 }
         ];
 
         let currentStage = 1;
         let selectedItems = new Set();
         let currentWeight = 0;
-        let targetWeightDrop = 0; // 记录需要丢掉的重量
-        let baselineWeight = 0;   // 记录进入新阶段时的初始重量
+        let baselineWeight = 0;
 
         const container = document.getElementById('items-container');
         const weightDisplay = document.getElementById('weight-display');
@@ -84,7 +82,6 @@
         const stageTitle = document.getElementById('stage-title');
         const stageDesc = document.getElementById('stage-desc');
 
-        // 渲染选项列表
         function renderItems() {
             container.innerHTML = '';
             items.forEach(item => {
@@ -107,7 +104,6 @@
             updateLogic();
         }
 
-        // 切换勾选状态
         window.toggleItem = function(id) {
             if (selectedItems.has(id)) {
                 selectedItems.delete(id);
@@ -117,7 +113,6 @@
             renderItems();
         }
 
-        // 核心逻辑判断
         function updateLogic() {
             currentWeight = 0;
             selectedItems.forEach(id => {
@@ -126,7 +121,6 @@
 
             weightDisplay.textContent = `${currentWeight} kg`;
             
-            // 进度条显示 (以20kg为满格参考)
             let percentage = (currentWeight / 20) * 100;
             if (percentage > 100) percentage = 100;
             weightBar.style.width = `${percentage}%`;
@@ -154,7 +148,7 @@
                     warningText.textContent = `已成功减轻 ${dropped}kg。`;
                     warningText.classList.replace('text-red-500', 'text-green-600');
                 } else {
-                    warningText.textContent = `还需丢弃 ${4 - dropped}kg。`;
+                    warningText.textContent = `还需丢弃 ${4 - dropped}kg。 (只丢掉小快乐是不够的哦)`;
                     warningText.classList.replace('text-green-600', 'text-red-500');
                 }
             }
@@ -166,7 +160,7 @@
                     warningText.textContent = `已成功减轻 ${dropped}kg。`;
                     warningText.classList.replace('text-red-500', 'text-green-600');
                 } else {
-                    warningText.textContent = `还需丢弃 ${6 - dropped}kg。`;
+                    warningText.textContent = `还需丢弃 ${6 - dropped}kg。必须狠下心来！`;
                     warningText.classList.replace('text-green-600', 'text-red-500');
                 }
             }
@@ -191,20 +185,19 @@
             }
         }
 
-        // 切换阶段
         nextBtn.onclick = () => {
             currentStage++;
-            baselineWeight = currentWeight; // 记录当前重量作为下一关的基准
+            baselineWeight = currentWeight;
 
             if (currentStage === 2) {
                 stageTitle.textContent = "第一关：烈日下的泥巴路";
-                stageDesc.textContent = "太阳太毒，体力不支。你必须立刻划掉 4kg。";
+                stageDesc.textContent = "大太阳下体力不支。你必须立刻划掉 4kg 才能继续。";
                 nextBtn.textContent = "继续前行";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } 
             else if (currentStage === 3) {
                 stageTitle.textContent = "第二关：脚车爆胎";
-                stageDesc.textContent = "计划全乱，意志崩溃。你必须再残忍丢掉 6kg！";
+                stageDesc.textContent = "突发意外，计划全乱，意志崩溃。你必须再残忍丢掉 6kg！";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
             else if (currentStage === 4) {
@@ -217,7 +210,7 @@
                 container.innerHTML = `
                     <div class="text-center mt-10">
                         <h2 class="text-2xl font-bold text-indigo-600 mb-4">你的最终行囊</h2>
-                        <p class="text-gray-700 mb-6">看着剩下的这 2 样东西，想想你刚才丢弃的那些。</p>
+                        <p class="text-gray-700 mb-6">看看这剩下的 2 样，再想想你刚才丢弃的那些。</p>
                         <div class="bg-white p-4 rounded-lg shadow border border-gray-200 text-left">
                             <ul class="list-disc pl-5 space-y-2 font-medium text-gray-800">
                                 ${Array.from(selectedItems).map(id => `<li>${items.find(i => i.id === id).text}</li>`).join('')}
@@ -232,7 +225,6 @@
             updateLogic();
         };
 
-        // 初始化
         renderItems();
     </script>
 </body>

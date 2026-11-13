@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-MY">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>适耕庄：20kg 人生行囊大挑战</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自定义勾选框的样式，让它在手机上更好点击 */
+        input[type="checkbox"] {
+            width: 1.5rem;
+            height: 1.5rem;
+            accent-color: #4F46E5;
+        }
+        .item-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .item-card.selected {
+            border-color: #4F46E5;
+            background-color: #EEF2FF;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased pb-20">
+
+    <!-- 顶部固定状态栏 -->
+    <div class="sticky top-0 z-50 bg-white shadow-md px-4 py-3">
+        <h1 class="text-lg font-bold text-gray-900 text-center mb-2" id="stage-title">阶段一：出发装包</h1>
+        <p class="text-sm text-gray-600 text-center mb-3" id="stage-desc">为你的未来挑选行囊。注意：总重量绝对不能超过 20 kg。</p>
+        
+        <div class="flex justify-between items-center mb-1">
+            <span class="text-sm font-semibold">当前重量:</span>
+            <span class="text-lg font-bold text-indigo-600" id="weight-display">0 kg</span>
+        </div>
+        <!-- 进度条 -->
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" id="weight-bar" style="width: 0%"></div>
+        </div>
+        <p class="text-xs text-red-500 font-semibold mt-1 hidden" id="warning-text">已超重！请减少物品。</p>
+    </div>
+
+    <!-- 选项列表 -->
+    <div class="p-4 max-w-lg mx-auto" id="items-container">
+        <!-- JS 会自动在这里生成选项 -->
+    </div>
+
+    <!-- 底部操作按钮 -->
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 flex justify-center">
+        <button id="next-btn" class="w-full max-w-lg bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg opacity-50 cursor-not-allowed transition-all" disabled>
+            确认出发
+        </button>
+    </div>
+
+    <script>
+        const items = [
+            { id: 1, text: "职场狂飙：极速升职加薪，薪水远超同龄人，但责任极大", weight: 7 },
+            { id: 2, text: "提早财富自由：顺利买到理想的车与房，物质生活令人羡慕", weight: 8 },
+            { id: 3, text: "完美的浪漫关系：拥有一段充满仪式感、情绪价值拉满的感情", weight: 6 },
+            { id: 4, text: "家族的骄傲：成为父母亲戚口中最有出息的孩子，满足长辈期待", weight: 6 },
+            { id: 5, text: "零差评的好人缘：在职场和朋友圈里所有人都喜欢你，不得罪任何人", weight: 6 },
+            { id: 6, text: "绝对的准时下班：下班绝不回信息，周末完全属于自己", weight: 5 },
+            { id: 7, text: "说走就走的自由：每年两次出国旅行，生活体验丰富自由", weight: 5 },
+            { id: 8, text: "追求终极梦想：不管能不能赚钱，全心全意去搞最爱的兴趣或创业", weight: 6 },
+            { id: 9, text: "极致的健康与自律：坚持干净饮食，永远保持最佳精神与身体状态", weight: 4 },
+            { id: 10, text: "疯狂的自我提升：永远在学习新技能考证，保证绝对不被社会淘汰", weight: 5 },
+            { id: 11, text: "核心黏合剂：你是朋友中最可靠的人，谁有困难你都第一时间冲去陪伴", weight: 5 },
+            { id: 12, text: "躺平的安全区：不承担大风险，只想安安稳稳待在舒适圈过小日子", weight: 5 },
+            { id: 13, text: "掌控一切的安全感：人生绝对按计划表进行，绝不允许出现意外", weight: 7 },
+            { id: 14, text: "成功的副业：除了正职，还有一个能赚钱的副业，不靠死薪水", weight: 6 },
+            { id: 15, text: "不求人的独立：无论遇到什么困难都自己扛下来，绝不开口麻烦别人", weight: 5 }
+        ];
+
+        let currentStage = 1;
+        let selectedItems = new Set();
+        let currentWeight = 0;
+        let targetWeightDrop = 0; // 记录需要丢掉的重量
+        let baselineWeight = 0;   // 记录进入新阶段时的初始重量
+
+        const container = document.getElementById('items-container');
+        const weightDisplay = document.getElementById('weight-display');
+        const weightBar = document.getElementById('weight-bar');
+        const warningText = document.getElementById('warning-text');
+        const nextBtn = document.getElementById('next-btn');
+        const stageTitle = document.getElementById('stage-title');
+        const stageDesc = document.getElementById('stage-desc');
+
+        // 渲染选项列表
+        function renderItems() {
+            container.innerHTML = '';
+            items.forEach(item => {
+                const isSelected = selectedItems.has(item.id);
+                const div = document.createElement('div');
+                div.className = `item-card border-2 rounded-lg p-4 mb-3 flex items-start gap-3 bg-white shadow-sm cursor-pointer ${isSelected ? 'selected' : 'border-gray-200'}`;
+                div.onclick = (e) => {
+                    if (e.target.tagName !== 'INPUT') toggleItem(item.id);
+                };
+                
+                div.innerHTML = `
+                    <input type="checkbox" id="item-${item.id}" class="mt-1" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleItem(${item.id})">
+                    <div class="flex-1">
+                        <label for="item-${item.id}" class="block text-gray-800 font-medium cursor-pointer">${item.text}</label>
+                        <span class="inline-block mt-1 bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">重量: ${item.weight} kg</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            updateLogic();
+        }
+
+        // 切换勾选状态
+        window.toggleItem = function(id) {
+            if (selectedItems.has(id)) {
+                selectedItems.delete(id);
+            } else {
+                selectedItems.add(id);
+            }
+            renderItems();
+        }
+
+        // 核心逻辑判断
+        function updateLogic() {
+            currentWeight = 0;
+            selectedItems.forEach(id => {
+                currentWeight += items.find(i => i.id === id).weight;
+            });
+
+            weightDisplay.textContent = `${currentWeight} kg`;
+            
+            // 进度条显示 (以20kg为满格参考)
+            let percentage = (currentWeight / 20) * 100;
+            if (percentage > 100) percentage = 100;
+            weightBar.style.width = `${percentage}%`;
+
+            let isValid = false;
+
+            if (currentStage === 1) {
+                if (currentWeight > 20) {
+                    weightBar.classList.replace('bg-indigo-600', 'bg-red-500');
+                    weightDisplay.classList.replace('text-indigo-600', 'text-red-500');
+                    warningText.classList.remove('hidden');
+                    warningText.textContent = "已超重 20kg！请减少物品。";
+                } else {
+                    weightBar.classList.replace('bg-red-500', 'bg-indigo-600');
+                    weightDisplay.classList.replace('text-red-500', 'text-indigo-600');
+                    warningText.classList.add('hidden');
+                    if (currentWeight > 0) isValid = true;
+                }
+            } 
+            else if (currentStage === 2) {
+                const dropped = baselineWeight - currentWeight;
+                warningText.classList.remove('hidden');
+                if (dropped >= 4) {
+                    isValid = true;
+                    warningText.textContent = `已成功减轻 ${dropped}kg。`;
+                    warningText.classList.replace('text-red-500', 'text-green-600');
+                } else {
+                    warningText.textContent = `还需丢弃 ${4 - dropped}kg。`;
+                    warningText.classList.replace('text-green-600', 'text-red-500');
+                }
+            }
+            else if (currentStage === 3) {
+                const dropped = baselineWeight - currentWeight;
+                warningText.classList.remove('hidden');
+                if (dropped >= 6) {
+                    isValid = true;
+                    warningText.textContent = `已成功减轻 ${dropped}kg。`;
+                    warningText.classList.replace('text-red-500', 'text-green-600');
+                } else {
+                    warningText.textContent = `还需丢弃 ${6 - dropped}kg。`;
+                    warningText.classList.replace('text-green-600', 'text-red-500');
+                }
+            }
+            else if (currentStage === 4) {
+                warningText.classList.remove('hidden');
+                if (selectedItems.size === 2) {
+                    isValid = true;
+                    warningText.textContent = "已保留最后 2 项。";
+                    warningText.classList.replace('text-red-500', 'text-green-600');
+                } else {
+                    warningText.textContent = `当前保留了 ${selectedItems.size} 项，必须只剩 2 项。`;
+                    warningText.classList.replace('text-green-600', 'text-red-500');
+                }
+            }
+
+            if (isValid) {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // 切换阶段
+        nextBtn.onclick = () => {
+            currentStage++;
+            baselineWeight = currentWeight; // 记录当前重量作为下一关的基准
+
+            if (currentStage === 2) {
+                stageTitle.textContent = "第一关：烈日下的泥巴路";
+                stageDesc.textContent = "太阳太毒，体力不支。你必须立刻划掉 4kg。";
+                nextBtn.textContent = "继续前行";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } 
+            else if (currentStage === 3) {
+                stageTitle.textContent = "第二关：脚车爆胎";
+                stageDesc.textContent = "计划全乱，意志崩溃。你必须再残忍丢掉 6kg！";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            else if (currentStage === 4) {
+                stageTitle.textContent = "第三关：极限二选一";
+                stageDesc.textContent = "离终点最后500米，你彻底耗尽。在剩下的东西里，只允许保留 2 项，其他全丢！";
+                nextBtn.textContent = "查看最终结果";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            else if (currentStage === 5) {
+                container.innerHTML = `
+                    <div class="text-center mt-10">
+                        <h2 class="text-2xl font-bold text-indigo-600 mb-4">你的最终行囊</h2>
+                        <p class="text-gray-700 mb-6">看着剩下的这 2 样东西，想想你刚才丢弃的那些。</p>
+                        <div class="bg-white p-4 rounded-lg shadow border border-gray-200 text-left">
+                            <ul class="list-disc pl-5 space-y-2 font-medium text-gray-800">
+                                ${Array.from(selectedItems).map(id => `<li>${items.find(i => i.id === id).text}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <p class="mt-8 text-sm text-gray-500">请保持此画面，等待主持人引导讨论。</p>
+                    </div>
+                `;
+                document.querySelector('.sticky').style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+            updateLogic();
+        };
+
+        // 初始化
+        renderItems();
+    </script>
+</body>
+</html>

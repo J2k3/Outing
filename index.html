@@ -50,7 +50,6 @@
     </div>
 
     <script>
-        // 全新升级的清单，加入了极具诱惑力的 1kg 和 2kg 选项
         const items = [
             { id: 1, text: "职场狂飙：极速升职加薪，薪水远超同龄人，但责任极大", weight: 7 },
             { id: 2, text: "提早财富自由：顺利买到理想的车与房，物质生活令人羡慕", weight: 8 },
@@ -71,6 +70,7 @@
 
         let currentStage = 1;
         let selectedItems = new Set();
+        let currentBackpack = []; // 记录玩家成功带入下一关的物品
         let currentWeight = 0;
         let baselineWeight = 0;
 
@@ -84,7 +84,11 @@
 
         function renderItems() {
             container.innerHTML = '';
-            items.forEach(item => {
+            
+            // 核心修改：第一关显示所有，后面的关卡只显示“包里还剩下的物品”
+            const displayItems = currentStage === 1 ? items : items.filter(i => currentBackpack.includes(i.id));
+
+            displayItems.forEach(item => {
                 const isSelected = selectedItems.has(item.id);
                 const div = document.createElement('div');
                 div.className = `item-card border-2 rounded-lg p-4 mb-3 flex items-start gap-3 bg-white shadow-sm cursor-pointer ${isSelected ? 'selected' : 'border-gray-200'}`;
@@ -110,7 +114,7 @@
             } else {
                 selectedItems.add(id);
             }
-            renderItems();
+            renderItems(); // 重新渲染颜色和勾选状态
         }
 
         function updateLogic() {
@@ -166,12 +170,13 @@
             }
             else if (currentStage === 4) {
                 warningText.classList.remove('hidden');
-                if (selectedItems.size === 2) {
+                // 核心修改：只允许保留 1 项
+                if (selectedItems.size === 1) {
                     isValid = true;
-                    warningText.textContent = "已保留最后 2 项。";
+                    warningText.textContent = "已选定你最后的底线。";
                     warningText.classList.replace('text-red-500', 'text-green-600');
                 } else {
-                    warningText.textContent = `当前保留了 ${selectedItems.size} 项，必须只剩 2 项。`;
+                    warningText.textContent = `当前保留了 ${selectedItems.size} 项，必须只能留 1 项。`;
                     warningText.classList.replace('text-green-600', 'text-red-500');
                 }
             }
@@ -186,33 +191,38 @@
         }
 
         nextBtn.onclick = () => {
-            currentStage++;
+            // 核心修改：锁定当前身上的物品，传给下一关
+            currentBackpack = Array.from(selectedItems); 
             baselineWeight = currentWeight;
+            currentStage++;
 
             if (currentStage === 2) {
                 stageTitle.textContent = "第一关：烈日下的泥巴路";
                 stageDesc.textContent = "大太阳下体力不支。你必须立刻划掉 4kg 才能继续。";
                 nextBtn.textContent = "继续前行";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                renderItems(); // 重新渲染，隐藏没选的东西
             } 
             else if (currentStage === 3) {
                 stageTitle.textContent = "第二关：脚车爆胎";
                 stageDesc.textContent = "突发意外，计划全乱，意志崩溃。你必须再残忍丢掉 6kg！";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                renderItems(); 
             }
             else if (currentStage === 4) {
-                stageTitle.textContent = "第三关：极限二选一";
-                stageDesc.textContent = "离终点最后500米，你彻底耗尽。在剩下的东西里，只允许保留 2 项，其他全丢！";
+                stageTitle.textContent = "第三关：极限抉择";
+                stageDesc.textContent = "离终点最后500米，你彻底耗尽。在你仅剩的东西里，只允许保留 1 项，其他全丢！";
                 nextBtn.textContent = "查看最终结果";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                renderItems(); 
             }
             else if (currentStage === 5) {
                 container.innerHTML = `
                     <div class="text-center mt-10">
-                        <h2 class="text-2xl font-bold text-indigo-600 mb-4">你的最终行囊</h2>
-                        <p class="text-gray-700 mb-6">看看这剩下的 2 样，再想想你刚才丢弃的那些。</p>
-                        <div class="bg-white p-4 rounded-lg shadow border border-gray-200 text-left">
-                            <ul class="list-disc pl-5 space-y-2 font-medium text-gray-800">
+                        <h2 class="text-2xl font-bold text-indigo-600 mb-4">你的最终底线</h2>
+                        <p class="text-gray-700 mb-6">经历了人生的风雨与爆胎，这是你最后死都不肯放手的东西：</p>
+                        <div class="bg-white p-4 rounded-lg shadow border border-indigo-200 text-left">
+                            <ul class="list-disc pl-5 space-y-2 font-bold text-gray-900 text-lg">
                                 ${Array.from(selectedItems).map(id => `<li>${items.find(i => i.id === id).text}</li>`).join('')}
                             </ul>
                         </div>
@@ -222,9 +232,9 @@
                 document.querySelector('.sticky').style.display = 'none';
                 nextBtn.style.display = 'none';
             }
-            updateLogic();
         };
 
+        // 初始启动
         renderItems();
     </script>
 </body>

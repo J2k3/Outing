@@ -50,13 +50,13 @@
     </div>
 
     <script>
-        // 扩充至 18 个选项，加入家庭、服侍与信仰
+        // 完美凑齐 20 个选项
         const items = [
             { id: 1, text: "职场狂飙：极速升职加薪，薪水远超同龄人，但责任极大", weight: 7 },
             { id: 2, text: "提早财富自由：顺利买到理想的车与房，物质生活令人羡慕", weight: 8 },
-            { id: 3, text: "温馨美满的家庭：拥有相爱相挺的家人，家是你最温暖的避风港", weight: 7 }, // 新增
-            { id: 4, text: "永恒的信仰与真理 (圣经)：拥有神的话语作指引，确信凡事都有神同在", weight: 6 }, // 新增
-            { id: 5, text: "同心合意的属灵伙伴：有一群陪你一起服侍、热血参与教会活动的弟兄姐妹", weight: 5 }, // 新增
+            { id: 3, text: "温馨美满的家庭：拥有相爱相挺的家人，家是你最温暖的避风港", weight: 7 },
+            { id: 4, text: "永恒的信仰与真理 (圣经)：拥有神的话语作指引，确信凡事都有神同在", weight: 6 },
+            { id: 5, text: "同心合意的属灵伙伴：有一群陪你一起服侍、热血参与教会活动的弟兄姐妹", weight: 5 },
             { id: 6, text: "完美的浪漫关系：拥有一段充满仪式感、情绪价值拉满的感情", weight: 6 },
             { id: 7, text: "家族的骄傲：成为亲戚口中最有出息的孩子，满足长辈期待", weight: 6 },
             { id: 8, text: "掌控一切的安全感：人生绝对按计划表进行，不允许出现意外", weight: 7 },
@@ -65,10 +65,13 @@
             { id: 11, text: "零差评的好人缘：在朋友圈和职场所有人都喜欢你，不得罪人", weight: 5 },
             { id: 12, text: "绝对的准时下班：下班绝不回信息，周末完全属于自己", weight: 4 },
             { id: 13, text: "极致的健康与自律：坚持运动和干净饮食，保持最佳状态", weight: 4 },
-            { id: 14, text: "毫无破绽的IG人设：在网上必须看起来精致、合群、闪闪发光", weight: 3 },
-            { id: 15, text: "周末彻底断联躺平：拒绝任何社交邀约，在家废废地过一天", weight: 2 },
-            { id: 16, text: "报复性熬夜刷手机：用牺牲睡眠来换取短暂逃避现实的自由", weight: 2 },
-            { id: 17, text: "每天一杯续命奶茶/咖啡：靠微小的甜食和快乐来对抗日常压力", weight: 1 }
+            { id: 14, text: "毛小孩的治愈陪伴：养一只永远爱你、懂你的猫猫/狗狗，回家有它在等门", weight: 3 }, // 新增的第20个选项 (3kg)
+            { id: 15, text: "毫无破绽的IG人设：在网上必须看起来精致、合群、闪闪发光", weight: 3 },
+            { id: 16, text: "周末的 Mamak/Cafe 吹水时光：必须有和朋友吐槽、放松压力的社交", weight: 2 }, 
+            { id: 17, text: "周末彻底断联躺平：拒绝任何社交邀约，在家废废地过一天", weight: 2 },
+            { id: 18, text: "报复性熬夜刷手机：用牺牲睡眠来换取短暂逃避现实的自由", weight: 2 },
+            { id: 19, text: "网购与盲盒解压 (Shopee/淘宝)：靠时不时买点小东西来犒劳自己", weight: 1 }, 
+            { id: 20, text: "每天一杯续命奶茶/咖啡：靠微小的甜食和快乐来对抗日常压力", weight: 1 }
         ];
 
         let currentStage = 1;
@@ -172,12 +175,15 @@
             }
             else if (currentStage === 4) {
                 warningText.classList.remove('hidden');
-                if (selectedItems.size === 1) {
+                if (selectedItems.size === 1 || selectedItems.size === 2) {
                     isValid = true;
-                    warningText.textContent = "已选定你最后的底线。";
+                    warningText.textContent = `已选定你最后的 ${selectedItems.size} 项底线。`;
                     warningText.classList.replace('text-red-500', 'text-green-600');
+                } else if (selectedItems.size === 0) {
+                    warningText.textContent = "至少需要保留 1 项作为你的底线！";
+                    warningText.classList.replace('text-green-600', 'text-red-500');
                 } else {
-                    warningText.textContent = `当前保留了 ${selectedItems.size} 项，必须只能留 1 项。`;
+                    warningText.textContent = `当前保留了 ${selectedItems.size} 项，最多只能留 2 项！`;
                     warningText.classList.replace('text-green-600', 'text-red-500');
                 }
             }
@@ -198,20 +204,20 @@
 
             if (currentStage === 2) {
                 stageTitle.textContent = "第一关：烈日下的泥巴路";
-                stageDesc.textContent = "大太阳下体力不支。你必须立刻划掉 4kg 才能继续。";
+                stageDesc.textContent = "大太阳下体力不支。你必须立刻划掉至少 4kg 才能继续。";
                 nextBtn.textContent = "继续前行";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 renderItems(); 
             } 
             else if (currentStage === 3) {
                 stageTitle.textContent = "第二关：脚车爆胎";
-                stageDesc.textContent = "突发意外，计划全乱，意志崩溃。你必须再残忍丢掉 6kg！";
+                stageDesc.textContent = "突发意外，意志崩溃。你必须再残忍丢掉至少 6kg！";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 renderItems(); 
             }
             else if (currentStage === 4) {
-                stageTitle.textContent = "第三关：极限抉择";
-                stageDesc.textContent = "离终点最后500米，你彻底耗尽。在你仅剩的东西里，只允许保留 1 项，其他全丢！";
+                stageTitle.textContent = "第三关：极限二选一";
+                stageDesc.textContent = "离终点最后500米。在你仅剩的东西里，最多只能保留 2 项，其他全丢！";
                 nextBtn.textContent = "查看最终结果";
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 renderItems(); 
